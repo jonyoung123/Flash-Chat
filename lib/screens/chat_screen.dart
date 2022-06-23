@@ -54,7 +54,7 @@ class _ChatScreenState extends State<ChatScreen> {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: <Widget>[
-            StreamBubble(),
+            const StreamBubble(),
             Container(
               decoration: kMessageContainerDecoration,
               child: Row(
@@ -72,14 +72,12 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                   TextButton(
                     onPressed: () {
-                      final date = DateTime.now();
-                      final time = "${date.hour}:${date.minute}";
                       textController.clear();
+
                       _firestore.collection('messages').add({
                         'text': messageText,
                         'sender': loggedInUser?.email,
-                        'date' : date,
-                        'time' : time
+                        'date' : DateTime.now(),
                       });
                       setState((){
                         messageText = '';
@@ -121,12 +119,10 @@ class StreamBubble extends StatelessWidget {
             final messageText1 = message['text'];
             final messageSender = message['sender'];
             final user = loggedInUser!.email;
-            final time = message['time'];
             MessageBubble messageBubble = MessageBubble(
                 text: messageText1,
                 sender: messageSender,
                 isMe: user == messageSender,
-              time1: time,
             );
             messageBubbles.add(messageBubble);
           }
@@ -146,12 +142,14 @@ class StreamBubble extends StatelessWidget {
 
 
 class MessageBubble extends StatelessWidget {
-  MessageBubble({required this.text, required this.sender, required this.isMe, required this.time1});
+  MessageBubble({required this.text,
+    required this.sender,
+    required this.isMe,
+  });
 
   final String text;
   final String sender;
   final bool isMe;
-  final String time1;
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -174,25 +172,12 @@ class MessageBubble extends StatelessWidget {
             color: isMe ? Colors.lightBlueAccent : Colors.white,
             child: Padding(
               padding: const EdgeInsets.only(top: 8, bottom: 5, left: 20, right: 20),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.end,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(text,
-                  textAlign: TextAlign.start,
-                  style: TextStyle(
-                      fontSize: 15.0,
-                    color: isMe ? Colors.white : Colors.black54,
-                  ),),
-                  Text(time1,
-                    textAlign: TextAlign.end,
-                    style: const TextStyle(
-                      fontSize: 14,
-                      color: Colors.white70,
-                    ),
-                  )
-                ],
-              ),
+              child: Text(text,
+                    textAlign: TextAlign.start,
+                    style: TextStyle(
+                        fontSize: 15.0,
+                      color: isMe ? Colors.white : Colors.black54,
+                    ),),
             ),
           ),
         ],
